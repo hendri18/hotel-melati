@@ -1,0 +1,56 @@
+body{
+    background-color: #dcdcdc;
+}
+.bg-dark{
+    background-color: $dark !important;
+}
+.img-slideshow{
+    width: 100%;
+    height: 420px;
+    
+    &.img-1{
+        background: url(https://placeimg.com/200/200/any?1);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    &.img-2{
+        background: url(https://placeimg.com/200/200/any?2);    
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    &.img-3{
+        background: url(https://placeimg.com/200/200/any?3);    
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    &.img-4{
+        background: url(https://placeimg.com/200/200/any?4);    
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
+
+.page .content{
+    background: $white;
+}
+
+.form-search-hotel{
+    .row{
+        background-color: $grey;
+    }
+    input, .btn{
+        height: 42px;
+    }
+
+    .btn-default{
+        background-color: $dark;
+        color: $white;
+    }
+    .mx-datepicker{
+        width: 100%;
+    }
+}
