@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="pt-3">
         <carousel :items="1" :autoplay="true" :nav="false" :loop="true">
             <div class="img-slideshow img-1"></div>
             <div class="img-slideshow img-2"></div>
@@ -11,10 +11,10 @@
                 <h4 class="text-center">Cari Kamar Hotel</h4>
                 <div class="row p-4">
                     <div class="col-md-4">
-                        <date-picker v-model="checkin_date" valueType="format"></date-picker>
+                        <date-picker v-model="checkin_date" valueType="format" placeholder="Check-in"></date-picker>
                     </div>
                     <div class="col-md-4">
-                        <date-picker v-model="checkout_date" valueType="format"></date-picker>
+                        <date-picker v-model="checkout_date" valueType="format" placeholder="Check-out"></date-picker>
                     </div>
                     <div class="col-md-4">
                         <button class="btn btn-default btn-block">Search</button>

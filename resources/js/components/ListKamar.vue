@@ -1,6 +1,7 @@
 <template>
-    <div class="py-5">
-        <h4 class="py-2" @click="searchRoom">List Kamar Hotel yang Tersedia</h4>
+    <div class="py-3">
+        <h4 class="py-2" @click="searchRoom">List Kamar Hotel yang Tersedia <a @click="$router.go(-1)" class="btn btn-default btn-dark float-right">Kembali</a></h4>
+        <p><strong>Dari Tanggal: {{this.checkin_date}} <sup>s</sup>/<sub>d</sub> {{this.checkout_date}}</strong></p>
         <div class="card my-3" v-for="(list, index) in dataList" v-bind:key="index">
             <div class="card-header">Featured</div>
             <div class="card-body">
@@ -24,8 +25,7 @@
                     </div>
                     <div class="col-md-4 d-flex align-items-end flex-column">
                         <div class="d-grid gap-2 d-md-block mt-auto">
-                            <button class="btn btn-primary" type="button">Button</button>
-                            <button class="btn btn-primary" type="button">Button</button>
+                            <router-link :to="{ name: 'pemesanan', params: {id: 1}, query:{checkin_date: checkin_date,checkout_date: checkout_date} }" class="btn btn-default btn-dark">Pesan</router-link>
                         </div>
                     </div>
                 </div>
@@ -41,16 +41,24 @@ import 'vue2-datepicker/index.css';
 export default {
     data(){
         return {
-            dataList: [1,2]
+            dataList: [1,2],
+            checkin_date: this.$route.query.checkin_date ?? '',
+            checkout_date: this.$route.query.checkout_date ?? ''
         }
     },
     components: { carousel, DatePicker },
     
     methods: {
         searchRoom(e){
-            console.log(this.dataList)
+            console.log(this.$route.query)
+            console.log(this.$route.query.checkin_date12)
             e.preventDefault();
         }
+    },
+    mounted(){
+        if(this.$isEmpty(this.$route.query.checkin_date) || this.$isEmpty(this.$route.query.checkout_date))
+            this.$router.push({name: 'home'});
+        
     }
 }
 </script>

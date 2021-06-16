@@ -11,8 +11,7 @@ import VueRouter from 'vue-router';
 import VueAxios from 'vue-axios';
 import axios from 'axios';
 import App from './components/App.vue';
-import VueSweetalert2 from 'vue-sweetalert2'; 
-import carousel from 'vue-owl-carousel'
+import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
 Vue.use(VueRouter);
@@ -21,7 +20,20 @@ Vue.use(VueAxios, axios);
 
 import Home from './components/Home.vue';
 import ListKamar from './components/ListKamar.vue';
+import Pemesanan from './components/Pemesanan.vue';
 import Vue from 'vue';
+
+const plugin = {
+    install() {
+      Vue.prototype.$isEmpty = (item) => {
+        if(!item) return true;
+        if(item == undefined) return true;
+        if(item == '') return true;
+      }
+    }
+  }
+  
+Vue.use(plugin)
 
 const routes = [
     {
@@ -33,6 +45,15 @@ const routes = [
         name: 'list',
         path: '/list',
         component: ListKamar
+    },
+    {
+        name: 'pemesanan',
+        path: '/pemesanan/:id',
+        component: Pemesanan
+    },
+    {
+        path: '*',
+        component: Home
     }
 ];
 

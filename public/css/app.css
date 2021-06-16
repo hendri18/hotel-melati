@@ -10944,6 +10944,7 @@ a.text-dark:focus {
 
 body {
   background-color: #dcdcdc;
+  background-image: url(/images/floral-fern-pink-khaki-cream-wallpaper-xgwe.jpg?d562cc8beddfc47f0fb26a71066999cc);
 }
 
 .bg-dark {
@@ -10984,7 +10985,7 @@ body {
 }
 
 .page .content {
-  background: #FFFFFF;
+  background: rgba(233, 233, 233, 0.8);
 }
 
 .form-search-hotel .row {
