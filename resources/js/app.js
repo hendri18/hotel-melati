@@ -21,6 +21,7 @@ Vue.use(VueAxios, axios);
 import Home from './components/Home.vue';
 import ListKamar from './components/ListKamar.vue';
 import Pemesanan from './components/Pemesanan.vue';
+import PemesananSelesai from './components/PemesananSelesai.vue';
 import Vue from 'vue';
 
 const plugin = {
@@ -50,6 +51,11 @@ const routes = [
         name: 'pemesanan',
         path: '/pemesanan/:id',
         component: Pemesanan
+    },
+    {
+      name: 'pemesanan-selesai',
+      path: '/pemesanan-selesai',
+      component: PemesananSelesai
     },
     {
         path: '*',

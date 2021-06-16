@@ -90,7 +90,7 @@
                             style="width: 215px"/>
                             <h4>Melati 1</h4>
                             <h5>Rp. 16.000.000</h5>
-                            <div><button class="btn btn-default btn-dark btn-block my-3">Pesan Sekarang</button></div>
+                            <div><router-link :to="{ name: 'pemesanan-selesai' }" class="btn btn-default btn-dark btn-block my-3">Pesan Sekarang</router-link></div>
                             <p>Feature: </p>
                             <ul>
                                 <li>2 Kasur Lebar</li>
