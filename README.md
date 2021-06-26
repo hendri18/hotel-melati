@@ -12,4 +12,4 @@ Step to install:
 - `php artisan serve`
 
 Production
-- `npm run build`
+- `npm run prod`
