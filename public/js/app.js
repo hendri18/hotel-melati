@@ -2033,9 +2033,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
 
 
 
@@ -2044,7 +2041,7 @@ __webpack_require__.r(__webpack_exports__);
     var _this$$route$query$ch, _this$$route$query$ch2;
 
     return {
-      dataList: [1, 2],
+      dataList: [],
       checkin_date: (_this$$route$query$ch = this.$route.query.checkin_date) !== null && _this$$route$query$ch !== void 0 ? _this$$route$query$ch : '',
       checkout_date: (_this$$route$query$ch2 = this.$route.query.checkout_date) !== null && _this$$route$query$ch2 !== void 0 ? _this$$route$query$ch2 : ''
     };
@@ -2060,10 +2057,45 @@ __webpack_require__.r(__webpack_exports__);
       e.preventDefault();
     }
   },
-  mounted: function mounted() {
+  beforeMount: function beforeMount() {
+    var _this = this;
+
+    this.$root.setLoading(true);
     if (this.$isEmpty(this.$route.query.checkin_date) || this.$isEmpty(this.$route.query.checkout_date)) this.$router.push({
       name: 'home'
     });
+    var params = {
+      checkin_date: this.checkin_date,
+      checkout_date: this.checkout_date
+    };
+    var paramString = new URLSearchParams(params);
+    var uri = '/api/list-kamar?' + paramString.toString();
+    this.axios.get(uri).then(function (response) {
+      _this.$root.setLoading(false);
+
+      if (response.data.data == 0 || response.data.code != 200) {
+        _this.$router.push({
+          name: 'home'
+        });
+
+        _this.$swal.fire({
+          text: "Tidak ada kamar yang tersedia",
+          icon: 'error'
+        });
+
+        return;
+      }
+
+      _this.dataList = response.data.data;
+    })["catch"](function (error) {
+      _this.$swal.fire({
+        text: 'Permintaan anda tidak dapat diproses, harap hubungi resepsionis',
+        icon: 'error'
+      });
+
+      _this.$root.setLoading(false);
+    });
+    ;
   }
 });
 
@@ -2078,11 +2110,9 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var vue_owl_carousel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-owl-carousel */ "./node_modules/vue-owl-carousel/dist/vue-owl-carousel.js");
-/* harmony import */ var vue_owl_carousel__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_owl_carousel__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue2-datepicker */ "./node_modules/vue2-datepicker/index.esm.js");
-/* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue2-datepicker/index.css");
-/* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue2-datepicker */ "./node_modules/vue2-datepicker/index.esm.js");
+/* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue2-datepicker/index.css");
+/* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_1__);
 //
 //
 //
@@ -2186,56 +2216,104 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
-    var _this$$route$query$ch, _this$$route$query$ch2;
+    var _this$$route$query$ch, _this$$route$query$ch2, _this$$route$params$i;
 
     return {
-      checkin_date: (_this$$route$query$ch = this.$route.query.checkin_date) !== null && _this$$route$query$ch !== void 0 ? _this$$route$query$ch : '',
-      checkout_date: (_this$$route$query$ch2 = this.$route.query.checkout_date) !== null && _this$$route$query$ch2 !== void 0 ? _this$$route$query$ch2 : ''
+      pemesanan: {
+        checkin_date: (_this$$route$query$ch = this.$route.query.checkin_date) !== null && _this$$route$query$ch !== void 0 ? _this$$route$query$ch : '',
+        checkout_date: (_this$$route$query$ch2 = this.$route.query.checkout_date) !== null && _this$$route$query$ch2 !== void 0 ? _this$$route$query$ch2 : '',
+        id_kamar: this.$route.params.id_kamar
+      },
+      id_kamar: (_this$$route$params$i = this.$route.params.id_kamar) !== null && _this$$route$params$i !== void 0 ? _this$$route$params$i : '',
+      kamar: {
+        type_kamar: {}
+      }
     };
   },
   components: {
-    carousel: vue_owl_carousel__WEBPACK_IMPORTED_MODULE_0___default.a,
-    DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_1__["default"]
+    DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   methods: {
-    searchRoom: function searchRoom(e) {
-      if (!this.checkin_date || !this.checkout_date) {
-        this.$swal.fire({
-          text: "Checkin dan Checkout tidak boleh kosong!",
-          icon: 'error'
-        });
-        return false;
-      }
+    pesan: function pesan(e) {
+      var _this = this;
 
-      if (this.checkin_date > this.checkout_date) {
-        this.$swal.fire({
-          text: "Tanggal Checkin tidak bisa lebih besar dari Tanggal Checkout!",
-          icon: 'error'
-        });
-        return false;
-      }
+      e.preventDefault();
+      console.log(this.pemesanan);
+      this.$root.setLoading(true);
+      if (this.$isEmpty(this.$route.query.checkin_date) || this.$isEmpty(this.$route.query.checkout_date)) this.$router.go(-1);
+      var uri = '/api/pesan';
+      this.axios.post(uri, this.pemesanan).then(function (response) {
+        _this.$root.setLoading(false);
 
-      this.$router.push({
-        name: 'list',
-        query: {
-          checkin_date: this.checkin_date,
-          checkout_date: this.checkout_date
+        if (response.data.code != 200) {
+          var _response$data$messag;
+
+          _this.$router.go(-1);
+
+          _this.$swal.fire({
+            text: (_response$data$messag = response.data.message) !== null && _response$data$messag !== void 0 ? _response$data$messag : '',
+            icon: 'error'
+          });
+
+          return;
         }
+
+        console.log(response.data.data);
+
+        _this.$router.push({
+          name: 'pemesanan-selesai',
+          params: {
+            id_transaksi: response.data.data.id_transaksi
+          }
+        });
+      })["catch"](function (error) {
+        _this.$swal.fire({
+          text: 'Permintaan anda tidak dapat diproses, harap hubungi resepsionis',
+          icon: 'error'
+        });
+
+        _this.$root.setLoading(false);
       });
       e.preventDefault();
     }
+  },
+  beforeMount: function beforeMount() {
+    var _this2 = this;
+
+    this.$root.setLoading(true);
+    if (this.$isEmpty(this.$route.params.id_kamar) || this.$isEmpty(this.$route.query.checkin_date) || this.$isEmpty(this.$route.query.checkout_date)) this.$router.push({
+      name: 'home'
+    });
+    var uri = '/api/list-kamar/' + this.$route.params.id_kamar;
+    this.axios.get(uri).then(function (response) {
+      _this2.$root.setLoading(false);
+
+      if (response.data.code != 200) {
+        _this2.$router.go(-1);
+
+        _this2.$swal.fire({
+          text: response.data.message,
+          icon: 'error'
+        });
+
+        return;
+      }
+
+      _this2.kamar = response.data.data;
+      console.log(_this2.kamar);
+    })["catch"](function (error) {
+      _this2.$swal.fire({
+        text: 'Permintaan anda tidak dapat diproses, harap hubungi resepsionis',
+        icon: 'error'
+      });
+
+      _this2.$root.setLoading(false);
+    });
+    ;
   }
 });
 
@@ -2268,10 +2346,52 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
-    return {};
+    return {
+      transaksi: {
+        kamar: {},
+        pengunjung: {}
+      }
+    };
   },
-  components: {},
-  methods: {}
+  methods: {},
+  beforeMount: function beforeMount() {
+    var _this = this;
+
+    this.$root.setLoading(true);
+    if (this.$isEmpty(this.$route.params.id_transaksi)) this.$router.push({
+      name: 'home'
+    });
+    var uri = '/api/pesan-detail/' + this.$route.params.id_transaksi;
+    this.axios.get(uri).then(function (response) {
+      _this.$root.setLoading(false);
+
+      if (response.data.data == 0 || response.data.code != 200) {
+        _this.$router.push({
+          name: 'home'
+        });
+
+        _this.$swal.fire({
+          text: "Permintaan anda tidak dapat diproses, harap hubungi resepsionis",
+          icon: 'error'
+        });
+
+        return;
+      }
+
+      _this.transaksi = response.data.data;
+    })["catch"](function (error) {
+      _this.$router.push({
+        name: 'home'
+      });
+
+      _this.$swal.fire({
+        text: 'Permintaan anda tidak dapat diproses, harap hubungi resepsionis',
+        icon: 'error'
+      });
+
+      _this.$root.setLoading(false);
+    });
+  }
 });
 
 /***/ }),
@@ -42964,6 +43084,8 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "page" }, [
+    _vm._m(0),
+    _vm._v(" "),
     _c("nav", { staticClass: "navbar navbar-dark bg-dark" }, [
       _c(
         "div",
@@ -42982,7 +43104,21 @@ var render = function() {
     _c("div", { staticClass: "container content" }, [_c("router-view")], 1)
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "loading-container" }, [
+      _c("div", { staticClass: "lds-ring" }, [
+        _c("div"),
+        _c("div"),
+        _c("div"),
+        _c("div")
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 
@@ -43150,17 +43286,52 @@ var render = function() {
       _vm._v(" "),
       _vm._l(_vm.dataList, function(list, index) {
         return _c("div", { key: index, staticClass: "card my-3" }, [
-          _c("div", { staticClass: "card-header" }, [_vm._v("Featured")]),
+          _c("div", { staticClass: "card-header" }, [
+            _vm._v(
+              "Type Kamar: " +
+                _vm._s(list.type_kamar ? list.type_kamar.nama_type_kamar : "")
+            )
+          ]),
           _vm._v(" "),
           _c("div", { staticClass: "card-body" }, [
             _c("div", { staticClass: "row" }, [
-              _vm._m(0, true),
+              _c("div", { staticClass: "col-md-4" }, [
+                _c("img", {
+                  staticClass: "w-100",
+                  staticStyle: { width: "215px" },
+                  attrs: { src: list.gambar, alt: "" }
+                })
+              ]),
               _vm._v(" "),
-              _vm._m(1, true),
+              _c("div", { staticClass: "col-md-7" }, [
+                _c("h5", { staticClass: "card-title" }, [
+                  _c("strong", [
+                    _vm._v("No Kamar: " + _vm._s(list.nomor_kamar))
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("p", {
+                  staticClass: "card-text",
+                  domProps: {
+                    innerHTML: _vm._s(
+                      list.type_kamar ? list.type_kamar.fasilitas : ""
+                    )
+                  }
+                }),
+                _vm._v(" "),
+                _c("br"),
+                _vm._v(" "),
+                _c("h5", [
+                  _vm._v(
+                    "Rp. " +
+                      _vm._s(list.type_kamar ? list.type_kamar.harga : "")
+                  )
+                ])
+              ]),
               _vm._v(" "),
               _c(
                 "div",
-                { staticClass: "col-md-4 d-flex align-items-end flex-column" },
+                { staticClass: "col-md-1 d-flex align-items-end flex-column" },
                 [
                   _c(
                     "div",
@@ -43173,7 +43344,7 @@ var render = function() {
                           attrs: {
                             to: {
                               name: "pemesanan",
-                              params: { id: 1 },
+                              params: { id_kamar: list.id_kamar },
                               query: {
                                 checkin_date: _vm.checkin_date,
                                 checkout_date: _vm.checkout_date
@@ -43196,44 +43367,7 @@ var render = function() {
     2
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-md-4" }, [
-      _c("img", {
-        staticClass: "w-100",
-        staticStyle: { width: "215px" },
-        attrs: {
-          src:
-            "https://images.oyoroomscdn.com/uploads/hotel_image/45626/medium/4d150273dc99ded1.jpg",
-          alt: ""
-        }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-md-4" }, [
-      _c("h5", { staticClass: "card-title" }, [
-        _vm._v("Special title treatment")
-      ]),
-      _vm._v(" "),
-      _c("p", { staticClass: "card-text" }, [
-        _vm._v(
-          "\n                        With supporting text below as a natural lead-in to additional\n                        content.\n                    "
-        )
-      ]),
-      _vm._v(" "),
-      _c("br"),
-      _vm._v(" "),
-      _c("h5", [_vm._v("Rp.xxx.xxx.xxx")])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -43256,11 +43390,20 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "py-3" }, [
-    _c("form", { attrs: { action: "" } }, [
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-md-8" }, [
-          _c("div", { staticClass: "card-body" }, [
-            _c("form", { attrs: { action: "" } }, [
+    _c(
+      "form",
+      {
+        on: {
+          submit: function($event) {
+            $event.preventDefault()
+            return _vm.pesan.apply(null, arguments)
+          }
+        }
+      },
+      [
+        _c("div", { staticClass: "row" }, [
+          _c("div", { staticClass: "col-md-8" }, [
+            _c("div", { staticClass: "card-body" }, [
               _c("h4", [
                 _vm._v("Reservasi Detail "),
                 _c(
@@ -43279,13 +43422,274 @@ var render = function() {
               _vm._v(" "),
               _c("hr"),
               _vm._v(" "),
-              _vm._m(0),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.pemesanan.id_kamar,
+                    expression: "pemesanan.id_kamar"
+                  }
+                ],
+                attrs: { type: "hidden", name: "id_kamar" },
+                domProps: { value: _vm.pemesanan.id_kamar },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.pemesanan, "id_kamar", $event.target.value)
+                  }
+                }
+              }),
               _vm._v(" "),
-              _vm._m(1),
+              _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-md-12" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { attrs: { for: "" } }, [
+                      _vm._v("Nama Pengunjung")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.pemesanan.nama,
+                          expression: "pemesanan.nama"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: { type: "text" },
+                      domProps: { value: _vm.pemesanan.nama },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(_vm.pemesanan, "nama", $event.target.value)
+                        }
+                      }
+                    })
+                  ])
+                ])
+              ]),
               _vm._v(" "),
-              _vm._m(2),
+              _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-md-12" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { attrs: { for: "" } }, [_vm._v("No KTP")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.pemesanan.no_ktp,
+                          expression: "pemesanan.no_ktp"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: { type: "text" },
+                      domProps: { value: _vm.pemesanan.no_ktp },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(_vm.pemesanan, "no_ktp", $event.target.value)
+                        }
+                      }
+                    })
+                  ])
+                ])
+              ]),
               _vm._v(" "),
-              _vm._m(3),
+              _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-md-12" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { attrs: { for: "" } }, [_vm._v("Alamat")]),
+                    _vm._v(" "),
+                    _c("textarea", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.pemesanan.alamat,
+                          expression: "pemesanan.alamat"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: { name: "", id: "", cols: "30", rows: "10" },
+                      domProps: { value: _vm.pemesanan.alamat },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(_vm.pemesanan, "alamat", $event.target.value)
+                        }
+                      }
+                    })
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-md-4" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { attrs: { for: "" } }, [_vm._v("Kota")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.pemesanan.kota,
+                          expression: "pemesanan.kota"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: { type: "text" },
+                      domProps: { value: _vm.pemesanan.kota },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(_vm.pemesanan, "kota", $event.target.value)
+                        }
+                      }
+                    })
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-4" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { attrs: { for: "" } }, [_vm._v("Provinsi")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.pemesanan.provinsi,
+                          expression: "pemesanan.provinsi"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: { type: "text" },
+                      domProps: { value: _vm.pemesanan.provinsi },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(
+                            _vm.pemesanan,
+                            "provinsi",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-4" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { attrs: { for: "" } }, [_vm._v("Kode Code")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.pemesanan.kode_pos,
+                          expression: "pemesanan.kode_pos"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: { type: "text" },
+                      domProps: { value: _vm.pemesanan.kode_pos },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(
+                            _vm.pemesanan,
+                            "kode_pos",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-md-4" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { attrs: { for: "" } }, [_vm._v("Phone")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.pemesanan.nomor_telepon,
+                          expression: "pemesanan.nomor_telepon"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: { type: "text" },
+                      domProps: { value: _vm.pemesanan.nomor_telepon },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(
+                            _vm.pemesanan,
+                            "nomor_telepon",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-8" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { attrs: { for: "" } }, [_vm._v("Email")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.pemesanan.email,
+                          expression: "pemesanan.email"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: { type: "text" },
+                      domProps: { value: _vm.pemesanan.email },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(_vm.pemesanan, "email", $event.target.value)
+                        }
+                      }
+                    })
+                  ])
+                ])
+              ]),
               _vm._v(" "),
               _c("div", { staticClass: "row" }, [
                 _c("div", { staticClass: "col-md-6" }, [
@@ -43299,11 +43703,11 @@ var render = function() {
                         staticClass: "w-100",
                         attrs: { valueType: "format" },
                         model: {
-                          value: _vm.checkin_date,
+                          value: _vm.pemesanan.checkin_date,
                           callback: function($$v) {
-                            _vm.checkin_date = $$v
+                            _vm.$set(_vm.pemesanan, "checkin_date", $$v)
                           },
-                          expression: "checkin_date"
+                          expression: "pemesanan.checkin_date"
                         }
                       })
                     ],
@@ -43324,11 +43728,11 @@ var render = function() {
                         staticClass: "w-100",
                         attrs: { valueType: "format" },
                         model: {
-                          value: _vm.checkout_date,
+                          value: _vm.pemesanan.checkout_date,
                           callback: function($$v) {
-                            _vm.checkout_date = $$v
+                            _vm.$set(_vm.pemesanan, "checkout_date", $$v)
                           },
-                          expression: "checkout_date"
+                          expression: "pemesanan.checkout_date"
                         }
                       })
                     ],
@@ -43337,51 +43741,34 @@ var render = function() {
                 ])
               ])
             ])
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-md-4" }, [
-          _c("div", { staticClass: "card" }, [
-            _c("div", { staticClass: "card-body" }, [
-              _c("img", {
-                staticClass: "w-100 pb-2",
-                staticStyle: { width: "215px" },
-                attrs: {
-                  src:
-                    "https://images.oyoroomscdn.com/uploads/hotel_image/45626/medium/4d150273dc99ded1.jpg",
-                  alt: ""
-                }
-              }),
-              _vm._v(" "),
-              _c("h4", [_vm._v("Melati 1")]),
-              _vm._v(" "),
-              _c("h5", [_vm._v("Rp. 16.000.000")]),
-              _vm._v(" "),
-              _c(
-                "div",
-                [
-                  _c(
-                    "router-link",
-                    {
-                      staticClass: "btn btn-default btn-dark btn-block my-3",
-                      attrs: { to: { name: "pemesanan-selesai" } }
-                    },
-                    [_vm._v("Pesan Sekarang")]
-                  )
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c("p", [_vm._v("Feature: ")]),
-              _vm._v(" "),
-              _vm._m(4),
-              _vm._v(" "),
-              _c("p", [_vm._v("Kenimatan tidur ")])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-md-4" }, [
+            _c("div", { staticClass: "card" }, [
+              _c("div", { staticClass: "card-body" }, [
+                _c("img", {
+                  staticClass: "w-100 pb-2",
+                  staticStyle: { width: "215px" },
+                  attrs: { src: _vm.kamar.gambar, alt: "" }
+                }),
+                _vm._v(" "),
+                _c("h4", [_vm._v(_vm._s(_vm.kamar.nomor_kamar))]),
+                _vm._v(" "),
+                _c("h5", [_vm._v("Rp. " + _vm._s(_vm.kamar.type_kamar.harga))]),
+                _vm._v(" "),
+                _vm._m(0),
+                _vm._v(" "),
+                _c("div", {
+                  domProps: {
+                    innerHTML: _vm._s(_vm.kamar.type_kamar.fasilitas)
+                  }
+                })
+              ])
             ])
           ])
         ])
-      ])
-    ])
+      ]
+    )
   ])
 }
 var staticRenderFns = [
@@ -43389,107 +43776,15 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-md-6" }, [
-        _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("First Name")]),
-          _vm._v(" "),
-          _c("input", { staticClass: "form-control", attrs: { type: "text" } })
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-md-6" }, [
-        _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("Last Name")]),
-          _vm._v(" "),
-          _c("input", { staticClass: "form-control", attrs: { type: "text" } })
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-md-12" }, [
-        _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("Address")]),
-          _vm._v(" "),
-          _c("textarea", {
-            staticClass: "form-control",
-            attrs: { name: "", id: "", cols: "30", rows: "10" }
-          })
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-md-4" }, [
-        _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("City")]),
-          _vm._v(" "),
-          _c("input", { staticClass: "form-control", attrs: { type: "text" } })
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-md-4" }, [
-        _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("State")]),
-          _vm._v(" "),
-          _c("input", { staticClass: "form-control", attrs: { type: "text" } })
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-md-4" }, [
-        _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("Zip Code")]),
-          _vm._v(" "),
-          _c("input", { staticClass: "form-control", attrs: { type: "text" } })
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-md-4" }, [
-        _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("Phone")]),
-          _vm._v(" "),
-          _c("input", { staticClass: "form-control", attrs: { type: "text" } })
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-md-8" }, [
-        _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("Email")]),
-          _vm._v(" "),
-          _c("input", { staticClass: "form-control", attrs: { type: "text" } })
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("ul", [
-      _c("li", [_vm._v("2 Kasur Lebar")]),
-      _vm._v(" "),
-      _c("li", [_vm._v("AC")]),
-      _vm._v(" "),
-      _c("li", [_vm._v("Kulkas")]),
-      _vm._v(" "),
-      _c("li", [_vm._v("TV")]),
-      _vm._v(" "),
-      _c("li", [_vm._v("Mesin Cuci")])
+    return _c("div", [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-default btn-dark btn-block my-3",
+          attrs: { type: "submit" }
+        },
+        [_vm._v("Pesan Sekarang")]
+      )
     ])
   }
 ]
@@ -43522,11 +43817,15 @@ var render = function() {
       _vm._v(" "),
       _vm._m(0),
       _vm._v(" "),
-      _vm._m(1),
+      _c("h4", [
+        _c("strong", [_vm._v(_vm._s(_vm.transaksi.kamar.nomor_kamar))])
+      ]),
       _vm._v(" "),
       _c("p", [_vm._v("Silahkan lakukan pembayaran di resepsionis sebesar: ")]),
       _vm._v(" "),
-      _vm._m(2),
+      _c("h5", [
+        _c("strong", [_vm._v("Rp. " + _vm._s(_vm.transaksi.total_harga))])
+      ]),
       _vm._v(" "),
       _c("p", [_vm._v("Lalu anda akan menerima kunci kamar anda.")]),
       _vm._v(" "),
@@ -43550,20 +43849,8 @@ var staticRenderFns = [
     return _c("p", [
       _vm._v("Selamat pemesanan anda berhasil "),
       _c("br"),
-      _vm._v(" Kamar anda berada di")
+      _vm._v(" Nomor kamar anda adalah")
     ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("h4", [_c("strong", [_vm._v("Lt. 2 No 45")])])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("h5", [_c("strong", [_vm._v("Rp. 16.000.000")])])
   }
 ]
 render._withStripped = true
@@ -63035,11 +63322,11 @@ var routes = [{
   component: _components_ListKamar_vue__WEBPACK_IMPORTED_MODULE_7__["default"]
 }, {
   name: 'pemesanan',
-  path: '/pemesanan/:id',
+  path: '/pemesanan/:id_kamar',
   component: _components_Pemesanan_vue__WEBPACK_IMPORTED_MODULE_8__["default"]
 }, {
   name: 'pemesanan-selesai',
-  path: '/pemesanan-selesai',
+  path: '/pemesanan-selesai/:id_transaksi',
   component: _components_PemesananSelesai_vue__WEBPACK_IMPORTED_MODULE_9__["default"]
 }, {
   path: '*',
@@ -63047,10 +63334,38 @@ var routes = [{
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]({
   mode: 'history',
-  routes: routes
+  routes: routes,
+  scrollBehavior: function scrollBehavior(to, from, savedPosition) {
+    return {
+      x: 0,
+      y: 0
+    };
+  }
 });
+router.beforeResolve(function (to, from, next) {
+  if (to.name) {
+    document.body.classList.add('loading');
+  }
+
+  next();
+});
+router.afterEach(function (to, from) {
+  document.body.classList.remove('loading');
+});
+
+var setLoading = function setLoading(status) {
+  if (status) {
+    document.body.classList.add('loading');
+  } else {
+    document.body.classList.remove('loading');
+  }
+};
+
 var app = new vue__WEBPACK_IMPORTED_MODULE_10___default.a(vue__WEBPACK_IMPORTED_MODULE_10___default.a.util.extend({
-  router: router
+  router: router,
+  methods: {
+    setLoading: setLoading
+  }
 }, _components_App_vue__WEBPACK_IMPORTED_MODULE_3__["default"])).$mount('#app');
 
 /***/ }),

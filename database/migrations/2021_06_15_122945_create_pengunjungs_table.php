@@ -13,9 +13,18 @@ class CreatePengunjungsTable extends Migration
      */
     public function up()
     {
-        Schema::create('pengunjungs', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::create('pengunjung', function (Blueprint $table) {
+            // $table->id();
+            $table->increments('id_pengunjung');
+            $table->string('no_ktp');
+            $table->string('nama');
+            $table->string('alamat')->nullable();
+            $table->string('kota')->nullable();
+            $table->string('provinsi')->nullable();
+            $table->string('kode_pos')->nullable();
+            $table->string('email')->nullable();
+            $table->string('nomor_telepon')->nullable();
+            // $table->timestamps();
         });
     }
 
@@ -26,6 +35,6 @@ class CreatePengunjungsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pengunjungs');
+        Schema::dropIfExists('pengunjung');
     }
 }

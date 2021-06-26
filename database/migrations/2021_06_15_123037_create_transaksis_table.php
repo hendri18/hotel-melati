@@ -13,9 +13,17 @@ class CreateTransaksisTable extends Migration
      */
     public function up()
     {
-        Schema::create('transaksis', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::create('transaksi', function (Blueprint $table) {
+            // $table->id();
+            $table->increments('id_transaksi');
+            $table->integer('id_pengunjung')->unsigned();
+            $table->foreign('id_pengunjung')->references('id_pengunjung')->on('pengunjung');
+            $table->integer('id_kamar')->unsigned();
+            $table->foreign('id_kamar')->references('id_kamar')->on('kamar');
+            $table->date('checkin_date');
+            $table->date('checkout_date');
+            $table->integer('total_harga');
+            // $table->timestamps();
         });
     }
 
@@ -26,6 +34,6 @@ class CreateTransaksisTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('transaksis');
+        Schema::dropIfExists('transaksi');
     }
 }

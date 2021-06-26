@@ -49,12 +49,12 @@ const routes = [
     },
     {
         name: 'pemesanan',
-        path: '/pemesanan/:id',
+        path: '/pemesanan/:id_kamar',
         component: Pemesanan
     },
     {
       name: 'pemesanan-selesai',
-      path: '/pemesanan-selesai',
+      path: '/pemesanan-selesai/:id_transaksi',
       component: PemesananSelesai
     },
     {
@@ -64,5 +64,24 @@ const routes = [
 ];
 
 
-const router = new VueRouter({ mode: 'history', routes: routes});
-const app = new Vue(Vue.util.extend({ router }, App)).$mount('#app');
+const router = new VueRouter({ mode: 'history', routes: routes, scrollBehavior(to, from, savedPosition){
+  return { x: 0, y: 0 }
+}});
+router.beforeResolve((to, from, next) => {
+  if (to.name) {
+      document.body.classList.add('loading');
+  }
+  next()
+})
+
+router.afterEach((to, from) => {
+  document.body.classList.remove('loading');
+})
+const setLoading = (status) => {
+  if(status){
+    document.body.classList.add('loading');
+  }else{
+    document.body.classList.remove('loading');
+  }
+}
+const app = new Vue(Vue.util.extend({ router, methods:{setLoading:setLoading} }, App)).$mount('#app');
