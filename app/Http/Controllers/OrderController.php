@@ -66,7 +66,7 @@ class OrderController extends Controller
 
             $kamar->status_kamar = 'not_available';
             $kamar->save();
-    
+            DB::commit();
             return ResponseHelper::generateResponse(['id_transaksi' => $transaksi->id_transaksi]);
         } catch (\Exception $e) {
             DB::rollBack();
