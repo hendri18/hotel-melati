@@ -63,6 +63,9 @@ class OrderController extends Controller
     
             $transaksi->total_harga = $abs_diff * $kamar->typeKamar->harga;
             $transaksi->save();
+
+            $kamar->status_kamar = 'not_available';
+            $kamar->save();
     
             return ResponseHelper::generateResponse(['id_transaksi' => $transaksi->id_transaksi]);
         } catch (\Exception $e) {
